@@ -108,9 +108,9 @@ The **Random Forest** classifier outperformed other models (XGBoost, Logistic Re
 - Python 3.8+
 - Git
 
-### Steps
+🙏 Acknowledgments
+World Health Organization (WHO) for SDG 3 data and statistics
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/sajal-samanta/heart-disease-prediction-sdg3.git
-   cd heart-disease-prediction-sdg3
+UCI Machine Learning Repository for the heart disease dataset
+
+Streamlit for the amazing web framework
