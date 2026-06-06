@@ -125,3 +125,9 @@ UCI Machine Learning Repository for the heart disease dataset
 Streamlit for the amazing web framework
 
 *This project was developed as part of an ESD (Engineering for Sustainable Development) submission to demonstrate how machine learning can directly contribute to SDG 3 – Good Health and Well-being.*
+
+
+
+cd heart-disease-prediction
+
+python -m streamlit run app.py
