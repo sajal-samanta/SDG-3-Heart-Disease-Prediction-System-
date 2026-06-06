@@ -132,7 +132,7 @@ def get_predictions():
     conn.close()
     return df
 
-# Load model and artifacts
+# Load model and artifacts (with monkey patch for sklearn version compatibility)
 @st.cache_resource
 def load_model():
     try:
@@ -140,10 +140,20 @@ def load_model():
         feature_names = joblib.load('models/feature_names.pkl')
         scaler = joblib.load('models/scaler.pkl')
         imputer = joblib.load('models/imputer.pkl')
+
+        # 🔧 MONKEY PATCH for scikit-learn 1.7.2 → 1.9.0 compatibility
+        if not hasattr(imputer, '_fill_dtype'):
+            if hasattr(imputer, 'statistics_') and imputer.statistics_ is not None:
+                imputer._fill_dtype = imputer.statistics_.dtype
+            else:
+                from sklearn.impute import SimpleImputer
+                dummy = SimpleImputer()
+                dummy.fit([[1, 2, 3]])
+                imputer._fill_dtype = dummy._fill_dtype
+
         return model, feature_names, scaler, imputer
     except Exception as e:
         st.error(f"Error loading model files: {str(e)}")
-        # List available files for debugging
         import os
         if os.path.exists('models'):
             st.write("Available files in models directory:")
@@ -169,12 +179,11 @@ if page == "🏠 Home":
     col1, col2 = st.columns([2, 1])
     
     with col1:
-        st.markdown('<div class="sub-header">🌍 Contribution to SDG 3 (Target 3)</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sub-header">🌍 Contribution to SDG 3 (Target 3.4)</div>', unsafe_allow_html=True)
         st.write("""
-        Cardiovascular diseases are the world's leading cause of death. This tool enables **early, low‑cost screening** – especially valuable in underserved communities. By identifying at‑risk individuals early, it promotes timely medical intervention and lifestyle changes, directly supporting **SDG target 3**: *reduce premature mortality from non‑communicable diseases by one‑third by 2030*.
+        Cardiovascular diseases are the world's leading cause of death. This tool enables **early, low‑cost screening** – especially valuable in underserved communities. By identifying at‑risk individuals early, it promotes timely medical intervention and lifestyle changes, directly supporting **SDG target 3.4**: *reduce premature mortality from non‑communicable diseases by one‑third by 2030*.
         """)
         
-        # --- NEW SDG 3 CONTENT START ---
         st.markdown('<div class="sub-header">🌍 What is SDG 3?</div>', unsafe_allow_html=True)
         st.write("""
         The United Nations Sustainable Development Goal 3 focuses on **ensuring healthy lives and promoting well‑being for people of all ages**.
@@ -214,7 +223,6 @@ if page == "🏠 Home":
         - Supporting informed healthcare decisions
         - Promoting healthy lifestyle choices
         """)
-        # --- NEW SDG 3 CONTENT END ---
         
         st.markdown('<div class="sub-header">📋 About the Project</div>', unsafe_allow_html=True)
         st.write("""
@@ -873,25 +881,6 @@ elif page == "📈 Analysis":
     
     with tab5:
         st.markdown('<div class="sub-header">💻 Source Code Repository</div>', unsafe_allow_html=True)
-        
-        st.markdown("""
-        ### 📁 Project Structure
-        ```
-        heart-disease-predictor/
-        ├── data/
-        │   └── heart.csv
-        ├── models/
-        │   ├── heart_disease_model.pkl
-        │   ├── feature_names.pkl
-        │   ├── scaler.pkl
-        │   └── imputer.pkl
-        ├── notebooks/
-        │   └── heart_disease_analysis.ipynb
-        ├── app.py
-        ├── requirements.txt
-        └── heart_predictions.db
-        ```
-        """)
         
         # Display key code snippets
         st.markdown("### 🔧 Key Code Snippets")
